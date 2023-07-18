@@ -64,16 +64,12 @@ class _ChartLinePainter {
     ChartLineLayer? oldLayer,
     ChartLineDataItem? oldItem,
   }) {
-    final double offsetX = painterData.size.width *
-        (item.x - xValue.min) /
-        (xValue.max - xValue.min);
+    final double offsetX = painterData.size.width * (item.x - xValue.min) / (xValue.max - xValue.min);
     final Offset pos = Offset(
       painterData.position.dx + offsetX,
       painterData.position.dy +
           painterData.size.height -
-          (painterData.size.height *
-              (item.value - yValue.min) /
-              (yValue.max - yValue.min)),
+          (painterData.size.height * (item.value - yValue.min) / (yValue.max - yValue.min)),
     );
     final ChartLineDataItem? oldItemLast = (oldLayer?.items)?.lastOrNull;
     item.setupValue(
@@ -82,10 +78,8 @@ class _ChartLinePainter {
       initialColor: oldItem?.lastValueColor ?? Colors.transparent,
       initialPos: oldItem?.lastValuePos ??
           (oldItemLast != null
-              ? Offset(painterData.position.dx + painterData.size.width,
-                  oldItemLast.lastValuePos.dy)
-              : Offset(
-                  pos.dx, painterData.position.dy + painterData.size.height)),
+              ? Offset(painterData.position.dx + painterData.size.width, oldItemLast.lastValuePos.dy)
+              : Offset(pos.dx, painterData.position.dy + painterData.size.height)),
       pos: pos,
       oldItem: oldItem,
     );
@@ -153,9 +147,7 @@ class _ChartLinePainter {
     }
     canvas.drawPath(
       curvePath,
-      paint
-        ..color =
-            layer.items.firstOrNull?.currentValueColor ?? Colors.transparent,
+      paint..color = layer.items.firstOrNull?.currentValueColor ?? Colors.transparent,
     );
   }
 }

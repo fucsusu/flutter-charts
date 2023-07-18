@@ -44,9 +44,7 @@ class _LinePageState extends State<LinePage> {
           padding: const EdgeInsets.all(24.0),
           child: Chart(
             layers: layers(),
-            padding: const EdgeInsets.symmetric(horizontal: 30.0).copyWith(
-              bottom: 12.0,
-            ),
+            padding: const EdgeInsets.only(left: 5, right: 15, top: 15, bottom: 0),
           ),
         ),
       ),
@@ -54,10 +52,9 @@ class _LinePageState extends State<LinePage> {
   }
 
   List<ChartLayer> layers() {
-    final from = DateTime(2021, 4);
-    final to = DateTime(2021, 8);
-    final frequency =
-        (to.millisecondsSinceEpoch - from.millisecondsSinceEpoch) / 3.0;
+    final from = DateTime(2021);
+    final to = DateTime(2024);
+    final frequency = (to.millisecondsSinceEpoch - from.millisecondsSinceEpoch) / 3.0;
     return [
       ChartHighlightLayer(
         shape: () => ChartHighlightLineShape<ChartLineDataItem>(
@@ -69,6 +66,7 @@ class _LinePageState extends State<LinePage> {
       ),
       ChartAxisLayer(
         settings: ChartAxisSettings(
+          xCenter: true,
           x: ChartAxisSettingsAxis(
             frequency: frequency,
             max: to.millisecondsSinceEpoch.toDouble(),
@@ -88,8 +86,7 @@ class _LinePageState extends State<LinePage> {
             ),
           ),
         ),
-        labelX: (value) => DateFormat('MMM')
-            .format(DateTime.fromMillisecondsSinceEpoch(value.toInt())),
+        labelX: (value) => DateFormat('yy').format(DateTime.fromMillisecondsSinceEpoch(value.toInt())),
         labelY: (value) => value.toInt().toString(),
       ),
       ChartLineLayer(

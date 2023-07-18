@@ -1,6 +1,6 @@
 part of 'chart_painter.dart';
 
-/// Layer painter for axis.
+/// 坐标轴绘制
 class _ChartAxisPainter {
   const _ChartAxisPainter._();
 
@@ -11,6 +11,7 @@ class _ChartAxisPainter {
     required ChartAxisLayer layer,
     required ChartPainterData painterDataAxisX,
     required ChartPainterData painterDataAxisY,
+    required ChartPainterData sheetPainterData,
     ChartAxisLayer? oldLayer,
   }) {
     _drawX(
@@ -19,7 +20,9 @@ class _ChartAxisPainter {
       data: layer.x,
       oldData: oldLayer?.x,
       painterData: painterDataAxisX,
+      sheetPainterData: sheetPainterData,
       settings: layer.settings.x,
+      xCenter: layer.settings.xCenter,
     );
     _drawY(
       canvas: canvas,
@@ -27,7 +30,9 @@ class _ChartAxisPainter {
       data: layer.y,
       oldData: oldLayer?.y,
       painterData: painterDataAxisY,
+      sheetPainterData: sheetPainterData,
       settings: layer.settings.y,
+      showDottedLine: layer.settings.xCenter,
     );
   }
 
@@ -38,9 +43,7 @@ class _ChartAxisPainter {
     required ChartAxisSettingsAxis settings,
     ChartAxisDataItem? oldItem,
   }) {
-    final double offsetX = painterData.size.width *
-        (item.value - settings.min) /
-        (settings.max - settings.min);
+    final double offsetX = painterData.size.width * (item.value - settings.min) / (settings.max - settings.min);
     final Offset pos = Offset(
       painterData.position.dx + offsetX,
       painterData.position.dy,
@@ -73,8 +76,7 @@ class _ChartAxisPainter {
       textDirection: TextDirection.ltr,
     )..layout();
     final double diff = settings.max - settings.min;
-    final double offsetY = painterData.size.height -
-        painterData.size.height * (item.value - settings.min) / diff;
+    final double offsetY = painterData.size.height - painterData.size.height * (item.value - settings.min) / diff;
     final Offset pos = Offset(
       painterData.position.dx + painterData.size.width,
       painterData.position.dy + offsetY - textPainter.height.half,
@@ -96,8 +98,10 @@ class _ChartAxisPainter {
     required AnimationController controller,
     required ChartAxisData data,
     required ChartPainterData painterData,
+    required ChartPainterData sheetPainterData,
     required ChartAxisSettingsAxis settings,
     ChartAxisData? oldData,
+    bool xCenter = false,
   }) {
     for (int i = 0; i < data.items.length; i++) {
       final ChartAxisDataItem item = data.items[i];
@@ -123,6 +127,24 @@ class _ChartAxisPainter {
         ),
       );
     }
+
+    if (xCenter) {
+      Paint linePaint = Paint();
+      linePaint.color = Colors.white;
+      linePaint.strokeWidth = 1;
+      linePaint.style = PaintingStyle.stroke;
+      double bottomDy = sheetPainterData.size.height + sheetPainterData.position.dy;
+      canvas.drawLine(Offset(sheetPainterData.position.dx, bottomDy),
+          Offset(sheetPainterData.position.dx + sheetPainterData.size.width + 1, bottomDy), linePaint);
+
+      canvas.drawDashLine(
+          List.generate(data.items.length + 1, (index) {
+            final double offsetX = painterData.size.width * (index * settings.frequency) / (settings.max - settings.min);
+            return Offset(painterData.position.dx + offsetX, bottomDy);
+          }),
+          1,
+          height: 5);
+    }
   }
 
   static void _drawY({
@@ -131,7 +153,9 @@ class _ChartAxisPainter {
     required ChartAxisData data,
     required ChartPainterData painterData,
     required ChartAxisSettingsAxis settings,
+    required ChartPainterData sheetPainterData,
     ChartAxisData? oldData,
+    bool showDottedLine = false,
   }) {
     for (int i = 0; i < data.items.length; i++) {
       final ChartAxisDataItem item = data.items[i];
@@ -156,6 +180,35 @@ class _ChartAxisPainter {
           item.currentPos.dy,
         ),
       );
+
+      if (showDottedLine && i != 0) {
+        Paint linePaint = Paint();
+        linePaint.color = Colors.white.withOpacity(0.4);
+        linePaint.strokeWidth = 1;
+        linePaint.style = PaintingStyle.stroke;
+        canvas.drawLine(
+            Offset(sheetPainterData.position.dx, item.currentPos.dy + textPainter.height.half),
+            Offset(sheetPainterData.position.dx + sheetPainterData.size.width, item.currentPos.dy + textPainter.height.half),
+            linePaint);
+      }
+    }
+  }
+}
+
+extension CanvasExt on Canvas {
+  void drawDashLine(
+    List<Offset> dataItems,
+    double dashWidth, {
+    Color color = Colors.white,
+    double height = 4,
+  }) {
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = dashWidth
+      ..style = PaintingStyle.stroke;
+
+    for (var element in dataItems) {
+      drawLine(element + Offset(dashWidth / 2, 0), element + Offset(dashWidth / 2, height), paint);
     }
   }
 }

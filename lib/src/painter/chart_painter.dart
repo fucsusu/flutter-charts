@@ -31,8 +31,7 @@ part 'chart_highlight_painter.dart';
 part 'chart_line_painter.dart';
 part 'chart_tooltip_painter.dart';
 
-typedef UpdateTouchableShapesCallback = void Function(
-    List<TouchableShape<ChartDataItem>> touchableShapes);
+typedef UpdateTouchableShapesCallback = void Function(List<TouchableShape<ChartDataItem>> touchableShapes);
 
 /// Provides chart painter.
 class ChartPainter extends CustomPainter {
@@ -74,8 +73,7 @@ class ChartPainter extends CustomPainter {
     _calculate(size);
     ChartAxisValue xValue = const ChartAxisValue.empty();
     ChartAxisValue yValue = const ChartAxisValue.empty();
-    final ChartLayer? axisLayer =
-        layers.firstWhereOrNull((element) => element is ChartAxisLayer);
+    final ChartLayer? axisLayer = layers.firstWhereOrNull((element) => element is ChartAxisLayer);
     final List<TouchableShape<ChartDataItem>> touchableShapes = [];
     if (axisLayer is ChartAxisLayer) {
       xValue = ChartAxisValue(
@@ -106,6 +104,7 @@ class ChartPainter extends CustomPainter {
           oldLayer: oldLayer is ChartAxisLayer ? oldLayer : null,
           painterDataAxisX: _axisXPainterData,
           painterDataAxisY: _axisYPainterData,
+          sheetPainterData: _sheetPainterData,
         );
       } else if (layer is ChartBarLayer) {
         _ChartBarPainter.draw(
@@ -164,8 +163,7 @@ class ChartPainter extends CustomPainter {
           canvas: canvas,
           layer: layer,
           painterData: _sheetPainterData,
-          tolerance: _sheetPainterData.position.dx -
-              (_axisYPainterData.position.dx + _axisYPainterData.size.width),
+          tolerance: _sheetPainterData.position.dx - (_axisYPainterData.position.dx + _axisYPainterData.size.width),
           touchedData: currentTouchedData,
         );
       } else if (layer is ChartHighlightLayer && currentTouchedData != null) {
@@ -173,8 +171,7 @@ class ChartPainter extends CustomPainter {
           canvas: canvas,
           layer: layer,
           painterData: _sheetPainterData,
-          tolerance: _sheetPainterData.position.dx -
-              (_axisYPainterData.position.dx + _axisYPainterData.size.width),
+          tolerance: _sheetPainterData.position.dx - (_axisYPainterData.position.dx + _axisYPainterData.size.width),
           touchedData: currentTouchedData,
         );
       }
@@ -182,6 +179,7 @@ class ChartPainter extends CustomPainter {
     onUpdateTouchableShapes?.call(touchableShapes);
   }
 
+  /// 计算基础数据
   void _calculate(Size size) {
     final ChartLayer? axisLayer = layers.firstWhereOrNull(
       (element) => element is ChartAxisLayer,
@@ -191,20 +189,15 @@ class ChartPainter extends CustomPainter {
     List<TextPainter> axisXTextPainters = [];
     List<TextPainter> axisYTextPainters = [];
     if (axisLayer is ChartAxisLayer) {
-      axisXTextPainters = _generateTextPainters(
-          axisLayer.x.items, axisLayer.settings.x.textStyle);
-      axisYTextPainters = _generateTextPainters(
-          axisLayer.y.items, axisLayer.settings.y.textStyle);
+      axisXTextPainters = _generateTextPainters(axisLayer.x.items, axisLayer.settings.x.textStyle);
+      axisYTextPainters = _generateTextPainters(axisLayer.y.items, axisLayer.settings.y.textStyle);
     }
     maxAxisXHeight = axisXTextPainters.biggestHeight;
     maxAxisYWidth = axisYTextPainters.biggestWidth;
-    final double axisXTextPainterFirstWidth =
-        axisXTextPainters.firstWidthOrZero;
+    final double axisXTextPainterFirstWidth = axisXTextPainters.firstWidthOrZero;
     final double axisXTextPainterLastWidth = axisXTextPainters.lastWidthOrZero;
-    final double axisYTextPainterFirstHeight =
-        axisYTextPainters.firstHeightOrZero;
-    final double axisYTextPainterLastHeight =
-        axisYTextPainters.lastHeightOrZero;
+    final double axisYTextPainterFirstHeight = axisYTextPainters.firstHeightOrZero;
+    final double axisYTextPainterLastHeight = axisYTextPainters.lastHeightOrZero;
     EdgeInsets paddingHorizontal = EdgeInsets.zero;
     paddingHorizontal = EdgeInsets.symmetric(
       horizontal: [
@@ -213,12 +206,10 @@ class ChartPainter extends CustomPainter {
           ].sorted((a, b) => a.compareTo(b)).lastOrNull ??
           0.0,
     );
+
     _sheetPainterData = ChartPainterData(
       position: Offset(
-        maxAxisYWidth +
-            axisXTextPainterFirstWidth.half +
-            paddingHorizontal.left.half +
-            padding.left,
+        maxAxisYWidth + axisXTextPainterFirstWidth.half + paddingHorizontal.left.half + padding.left,
         axisYTextPainterLastHeight.half + padding.top,
       ),
       size: Size(
@@ -228,20 +219,13 @@ class ChartPainter extends CustomPainter {
             axisXTextPainterLastWidth.half -
             paddingHorizontal.horizontal.half -
             padding.horizontal,
-        size.height -
-            maxAxisXHeight -
-            axisYTextPainterLastHeight.half -
-            axisYTextPainterFirstHeight.half -
-            padding.vertical,
+        size.height - maxAxisXHeight - axisYTextPainterLastHeight.half - axisYTextPainterFirstHeight.half - padding.vertical,
       ),
     );
     _axisXPainterData = ChartPainterData(
       position: Offset(
         _sheetPainterData.position.dx,
-        _sheetPainterData.position.dy +
-            _sheetPainterData.size.height +
-            axisYTextPainterFirstHeight.half +
-            padding.bottom,
+        _sheetPainterData.position.dy + _sheetPainterData.size.height + axisYTextPainterFirstHeight.half + padding.bottom,
       ),
       size: Size(
         _sheetPainterData.size.width,
@@ -297,8 +281,7 @@ class ChartPainter extends CustomPainter {
             .map(
               (e) {
                 final int maxIndex = e.items.firstOrNull?.length ?? 0;
-                return maxIndex * e.settings.thickness +
-                    (maxIndex - 1) * e.settings.paddingBetweenItems;
+                return maxIndex * e.settings.thickness + (maxIndex - 1) * e.settings.paddingBetweenItems;
               },
             )
             .sorted((a, b) => a.compareTo(b))
@@ -345,13 +328,9 @@ extension _IterableDoubleExtensions on Iterable<double> {
 }
 
 extension _ListTextPainterExtensions on List<TextPainter> {
-  double get biggestHeight => isNotEmpty
-      ? (copy()..sort((a, b) => a.height.compareTo(b.height))).last.height
-      : 0.0;
+  double get biggestHeight => isNotEmpty ? (copy()..sort((a, b) => a.height.compareTo(b.height))).last.height : 0.0;
 
-  double get biggestWidth => isNotEmpty
-      ? (copy()..sort((a, b) => a.width.compareTo(b.width))).last.width
-      : 0.0;
+  double get biggestWidth => isNotEmpty ? (copy()..sort((a, b) => a.width.compareTo(b.width))).last.width : 0.0;
 
   double get firstHeightOrZero => isNotEmpty ? first.height : 0.0;
 

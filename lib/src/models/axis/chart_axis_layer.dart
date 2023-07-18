@@ -18,12 +18,14 @@ class ChartAxisLayer extends ChartLayer {
   /// The settings of the axis.
   final ChartAxisSettings settings;
 
+  /// 对坐标轴进行数值转化
   ChartAxisLayer({
     required String Function(double) labelX,
     required String Function(double) labelY,
     required this.settings,
   })  : x = settings.x.generate(
           label: labelX,
+          center: settings.xCenter,
         ),
         y = settings.y.generate(
           label: labelY,

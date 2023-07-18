@@ -6,15 +6,15 @@ class ChartAxisSettingsAxis {
   final double frequency;
 
   /// The max of the value in the axis.
-  final double max;
+  double max;
 
   /// The min of the value in the axis.
-  final double min;
+  double min;
 
   /// The TextStyle in axis.
   final TextStyle textStyle;
 
-  const ChartAxisSettingsAxis({
+  ChartAxisSettingsAxis({
     required this.frequency,
     required this.max,
     required this.min,
@@ -24,8 +24,24 @@ class ChartAxisSettingsAxis {
   /// Generate all items of axis.
   ChartAxisData generate({
     required String Function(double) label,
-  }) =>
-      ChartAxisData(
+    bool center = false,
+  }) {
+    if (center) {
+      max = max + frequency * 0.5;
+      min = min - frequency * 0.5;
+      return ChartAxisData(
+        max: max,
+        min: min,
+        items: List.generate(
+          (max - min) ~/ frequency,
+          (index) => ChartAxisDataItem(
+            label: label((index + 0.5) * frequency + min),
+            value: (index + 0.5) * frequency + min,
+          ),
+        ),
+      );
+    } else {
+      return ChartAxisData(
         max: max,
         min: min,
         items: List.generate(
@@ -36,4 +52,6 @@ class ChartAxisSettingsAxis {
           ),
         ),
       );
+    }
+  }
 }
