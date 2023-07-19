@@ -97,9 +97,17 @@ class _LinePageState extends State<LinePage> {
             value: Random().nextInt(380) + 20,
           ),
         ),
-        settings: const ChartLineSettings(
-          color: Color(0xFF8043F9),
-          thickness: 4.0,
+        settings: ChartLineSettings(
+          color: const Color(0xFF8043F9),
+          thickness: 2.0,
+          useCurve: false,
+          pointBuild: (offset, canvas) {
+            Paint paint = Paint()
+              ..strokeJoin = StrokeJoin.round
+              ..strokeWidth = 1
+              ..color = const Color(0xFFF9B043);
+            canvas.drawCircle(offset, 2, paint);
+          },
         ),
       ),
       ChartTooltipLayer(

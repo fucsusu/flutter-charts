@@ -28,10 +28,8 @@ class _ChartLinePainter {
         yValue: yValue,
       );
     }
-    _draw(
-      canvas: canvas,
-      layer: layer,
-    );
+    _draw(canvas: canvas, layer: layer);
+
     final double v1 = (layer.items.getOrNull(1)?.currentValuePos)?.dx ?? 0.0;
     final double v2 = (layer.items.firstOrNull?.currentValuePos)?.dx ?? 0.0;
     final double weight = (max(v1, v2) - min(v1, v2)) * 0.9;
@@ -114,11 +112,27 @@ class _ChartLinePainter {
     required Canvas canvas,
     required ChartLineLayer layer,
   }) {
-    final Path curvePath = Path();
     final Paint paint = Paint()
       ..strokeWidth = layer.settings.thickness
       ..style = PaintingStyle.stroke
+      ..strokeJoin = StrokeJoin.round
+      ..strokeCap = StrokeCap.round
       ..color = layer.settings.color;
+
+    if (layer.settings.useCurve) {
+      _drawCurvePath(canvas: canvas, layer: layer, paint: paint);
+    } else {
+      _drawStraightPath(canvas: canvas, layer: layer, paint: paint);
+    }
+  }
+
+  static void _drawCurvePath({
+    required Canvas canvas,
+    required ChartLineLayer layer,
+    required Paint paint,
+  }) {
+    final Path curvePath = Path();
+
     late Offset previousPos;
     for (int i = 0; i < layer.items.length; i++) {
       final ChartLineDataItem lineItem = layer.items[i];
@@ -149,5 +163,36 @@ class _ChartLinePainter {
       curvePath,
       paint..color = layer.items.firstOrNull?.currentValueColor ?? Colors.transparent,
     );
+    for (int i = 0; i < layer.items.length; i++) {
+      layer.settings.pointBuild?.call(layer.items[i].currentValuePos, canvas);
+    }
+  }
+
+  static void _drawStraightPath({
+    required Canvas canvas,
+    required ChartLineLayer layer,
+    required Paint paint,
+  }) {
+    final Path straightPath = Path();
+    for (int i = 0; i < layer.items.length; i++) {
+      final ChartLineDataItem lineItem = layer.items[i];
+      final Offset currentPos = lineItem.currentValuePos;
+      if (i < 1) {
+        straightPath.moveTo(currentPos.dx, currentPos.dy);
+      } else {
+        straightPath.lineTo(
+          currentPos.dx,
+          currentPos.dy,
+        );
+      }
+    }
+    canvas.drawPath(
+      straightPath,
+      paint..color = layer.items.firstOrNull?.currentValueColor ?? Colors.transparent,
+    );
+
+    for (int i = 0; i < layer.items.length; i++) {
+      layer.settings.pointBuild?.call(layer.items[i].currentValuePos, canvas);
+    }
   }
 }
