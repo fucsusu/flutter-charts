@@ -13,6 +13,9 @@ class ChartLineSettings {
   /// 是否拐点是否使用平滑曲线
   final bool useCurve;
 
+  /// 是否先显示面积图
+  final bool useArea;
+
   /// 点位显示的样式
   final PointBuild? pointBuild;
 
@@ -20,6 +23,7 @@ class ChartLineSettings {
     required this.color,
     required this.thickness,
     this.useCurve = true,
+    this.useArea = false,
     this.pointBuild,
   });
 }

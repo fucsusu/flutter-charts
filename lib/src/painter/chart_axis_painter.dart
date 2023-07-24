@@ -22,7 +22,6 @@ class _ChartAxisPainter {
       painterData: painterDataAxisX,
       sheetPainterData: sheetPainterData,
       settings: layer.settings.x,
-      xCenter: layer.settings.xCenter,
     );
     _drawY(
       canvas: canvas,
@@ -32,7 +31,6 @@ class _ChartAxisPainter {
       painterData: painterDataAxisY,
       sheetPainterData: sheetPainterData,
       settings: layer.settings.y,
-      showDottedLine: layer.settings.xCenter,
     );
   }
 
@@ -101,7 +99,6 @@ class _ChartAxisPainter {
     required ChartPainterData sheetPainterData,
     required ChartAxisSettingsAxis settings,
     ChartAxisData? oldData,
-    bool xCenter = false,
   }) {
     for (int i = 0; i < data.items.length; i++) {
       final ChartAxisDataItem item = data.items[i];
@@ -128,12 +125,19 @@ class _ChartAxisPainter {
       );
     }
 
-    if (xCenter) {
+    if (settings.showAxis) {
       Paint linePaint = Paint();
-      linePaint.color = Colors.white;
+      linePaint.color = settings.axisColor;
       linePaint.strokeWidth = 1;
       linePaint.style = PaintingStyle.stroke;
       double bottomDy = sheetPainterData.size.height + sheetPainterData.position.dy;
+
+      // canvas.drawCircle(sheetPainterData.position, 5, linePaint);
+      // canvas.drawRect(
+      //     Rect.fromPoints(sheetPainterData.position,
+      //         sheetPainterData.position + Offset(sheetPainterData.size.width, sheetPainterData.size.height)),
+      //     linePaint);
+
       canvas.drawLine(Offset(sheetPainterData.position.dx, bottomDy),
           Offset(sheetPainterData.position.dx + sheetPainterData.size.width + 1, bottomDy), linePaint);
 
@@ -155,7 +159,6 @@ class _ChartAxisPainter {
     required ChartAxisSettingsAxis settings,
     required ChartPainterData sheetPainterData,
     ChartAxisData? oldData,
-    bool showDottedLine = false,
   }) {
     for (int i = 0; i < data.items.length; i++) {
       final ChartAxisDataItem item = data.items[i];
@@ -181,9 +184,9 @@ class _ChartAxisPainter {
         ),
       );
 
-      if (showDottedLine && i != 0) {
+      if (settings.showAxis && i != 0) {
         Paint linePaint = Paint();
-        linePaint.color = Colors.white.withOpacity(0.4);
+        linePaint.color = settings.axisColor;
         linePaint.strokeWidth = 1;
         linePaint.style = PaintingStyle.stroke;
         canvas.drawLine(

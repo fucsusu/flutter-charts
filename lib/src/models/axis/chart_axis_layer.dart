@@ -3,8 +3,11 @@ import 'package:mrx_charts/src/models/animation/chart_animation.dart';
 import 'package:mrx_charts/src/models/chart_layer.dart';
 
 part 'data/chart_axis_data.dart';
+
 part 'data/chart_axis_data_item.dart';
+
 part 'settings/chart_axis_settings.dart';
+
 part 'settings/chart_axis_settings_axis.dart';
 
 /// This layer allows to render axises.
@@ -25,7 +28,7 @@ class ChartAxisLayer extends ChartLayer {
     required this.settings,
   })  : x = settings.x.generate(
           label: labelX,
-          center: settings.xCenter,
+          center: settings.centerX,
         ),
         y = settings.y.generate(
           label: labelY,

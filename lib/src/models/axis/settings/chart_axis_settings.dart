@@ -2,8 +2,9 @@ part of '../chart_axis_layer.dart';
 
 /// A collection of values for settings in axises.
 class ChartAxisSettings {
-  /// x轴是否居中
-  final bool xCenter;
+
+  /// X轴是否居中显示
+  final bool centerX;
 
   /// The x of the axis.
   final ChartAxisSettingsAxis x;
@@ -14,6 +15,6 @@ class ChartAxisSettings {
   const ChartAxisSettings({
     required this.x,
     required this.y,
-    this.xCenter = false,
+    this.centerX=false,
   });
 }

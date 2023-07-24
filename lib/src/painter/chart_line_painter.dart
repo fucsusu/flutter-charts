@@ -28,7 +28,7 @@ class _ChartLinePainter {
         yValue: yValue,
       );
     }
-    _draw(canvas: canvas, layer: layer);
+    _draw(canvas: canvas, layer: layer, painterData: painterData);
 
     final double v1 = (layer.items.getOrNull(1)?.currentValuePos)?.dx ?? 0.0;
     final double v2 = (layer.items.firstOrNull?.currentValuePos)?.dx ?? 0.0;
@@ -111,6 +111,7 @@ class _ChartLinePainter {
   static void _draw({
     required Canvas canvas,
     required ChartLineLayer layer,
+    required ChartPainterData painterData,
   }) {
     final Paint paint = Paint()
       ..strokeWidth = layer.settings.thickness
@@ -119,14 +120,27 @@ class _ChartLinePainter {
       ..strokeCap = StrokeCap.round
       ..color = layer.settings.color;
 
+    Path drawPath;
     if (layer.settings.useCurve) {
-      _drawCurvePath(canvas: canvas, layer: layer, paint: paint);
+      drawPath = _drawCurvePath(canvas: canvas, layer: layer, paint: paint);
     } else {
-      _drawStraightPath(canvas: canvas, layer: layer, paint: paint);
+      drawPath = _drawStraightPath(canvas: canvas, layer: layer, paint: paint);
+    }
+
+    if (layer.settings.useArea) {
+      ChartLineDataItem firstItem = layer.items.first;
+      ChartLineDataItem lastItem = layer.items.last;
+      double bottomDy = painterData.size.height + painterData.position.dy;
+      drawPath.lineTo(lastItem.currentValuePos.dx, bottomDy);
+      drawPath.lineTo(firstItem.currentValuePos.dx, bottomDy);
+      drawPath.close();
+      paint.style = PaintingStyle.fill;
+      paint.color = layer.settings.color.withAlpha(80);
+      canvas.drawPath(drawPath, paint);
     }
   }
 
-  static void _drawCurvePath({
+  static Path _drawCurvePath({
     required Canvas canvas,
     required ChartLineLayer layer,
     required Paint paint,
@@ -166,9 +180,10 @@ class _ChartLinePainter {
     for (int i = 0; i < layer.items.length; i++) {
       layer.settings.pointBuild?.call(layer.items[i].currentValuePos, canvas);
     }
+    return curvePath;
   }
 
-  static void _drawStraightPath({
+  static Path _drawStraightPath({
     required Canvas canvas,
     required ChartLineLayer layer,
     required Paint paint,
@@ -194,5 +209,6 @@ class _ChartLinePainter {
     for (int i = 0; i < layer.items.length; i++) {
       layer.settings.pointBuild?.call(layer.items[i].currentValuePos, canvas);
     }
+    return straightPath;
   }
 }

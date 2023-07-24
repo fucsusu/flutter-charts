@@ -44,7 +44,7 @@ class _LinePageState extends State<LinePage> {
           padding: const EdgeInsets.all(24.0),
           child: Chart(
             layers: layers(),
-            padding: const EdgeInsets.only(left: 5, right: 15, top: 15, bottom: 0),
+            padding: const EdgeInsets.only(left: 0, right: 0, top: 0, bottom: 0),
           ),
         ),
       ),
@@ -66,8 +66,10 @@ class _LinePageState extends State<LinePage> {
       ),
       ChartAxisLayer(
         settings: ChartAxisSettings(
-          xCenter: true,
+          centerX: true,
           x: ChartAxisSettingsAxis(
+            showAxis: true,
+            axisColor: Colors.white,
             frequency: frequency,
             max: to.millisecondsSinceEpoch.toDouble(),
             min: from.millisecondsSinceEpoch.toDouble(),
@@ -77,6 +79,8 @@ class _LinePageState extends State<LinePage> {
             ),
           ),
           y: ChartAxisSettingsAxis(
+            showAxis: true,
+            axisColor: Colors.white.withAlpha(90),
             frequency: 100.0,
             max: 400.0,
             min: 0.0,
@@ -94,13 +98,14 @@ class _LinePageState extends State<LinePage> {
           4,
           (index) => ChartLineDataItem(
             x: (index * frequency) + from.millisecondsSinceEpoch,
-            value: Random().nextInt(380) + 20,
+            value: index * 100,
           ),
         ),
         settings: ChartLineSettings(
           color: const Color(0xFF8043F9),
           thickness: 2.0,
           useCurve: false,
+          useArea: true,
           pointBuild: (offset, canvas) {
             Paint paint = Paint()
               ..strokeJoin = StrokeJoin.round

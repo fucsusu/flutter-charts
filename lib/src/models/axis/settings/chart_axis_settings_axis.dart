@@ -14,11 +14,19 @@ class ChartAxisSettingsAxis {
   /// The TextStyle in axis.
   final TextStyle textStyle;
 
+  /// 轴是否显示
+  final bool showAxis;
+
+  /// 轴颜色
+  final Color axisColor;
+
   ChartAxisSettingsAxis({
     required this.frequency,
     required this.max,
     required this.min,
     required this.textStyle,
+    this.showAxis = false,
+    this.axisColor = Colors.white,
   });
 
   /// Generate all items of axis.
