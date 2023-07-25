@@ -4,6 +4,63 @@ part of 'chart_painter.dart';
 class _ChartLinePainter {
   const _ChartLinePainter._();
 
+  /// 绘制叠层图
+  static void drawStack({
+    required Canvas canvas,
+    required AnimationController controller,
+    required ChartLineStackLayer layer,
+    required ChartPainterData painterData,
+    required List<TouchableShape<ChartDataItem>> touchableShapes,
+    required ChartAxisValue xValue,
+    required ChartAxisValue yValue,
+    ChartLineStackLayer? oldLayer,
+  }) {
+    if (layer.items.isNotEmpty) {
+      Path? prePath;
+      for (var lineLayer in layer.items) {
+        for (int j = 0; j < lineLayer.items.length; j++) {
+          ChartLineDataItem item = lineLayer.items[j];
+          _calculate(
+            controller: controller,
+            item: item,
+            oldItem: lineLayer.items.getOrNull(j),
+            oldLayer: lineLayer,
+            painterData: painterData,
+            settings: lineLayer.settings,
+            xValue: xValue,
+            yValue: yValue,
+          );
+        }
+        prePath = _drawPath(canvas: canvas, layer: lineLayer, painterData: painterData, prePath: prePath);
+
+        /// 绘制点位
+        for (int i = 0; i < lineLayer.items.length; i++) {
+          lineLayer.settings.pointBuild?.call(lineLayer.items[i].currentValuePos, canvas);
+        }
+      }
+    }
+// final double v1 = (layer.items.getOrNull(1)?.currentValuePos)?.dx ?? 0.0;
+// final double v2 = (layer.items.firstOrNull?.currentValuePos)?.dx ?? 0.0;
+// final double weight = (max(v1, v2) - min(v1, v2)) * 0.9;
+// for (int i = 0; i < layer.items.length; i++) {
+//   final ChartLineDataItem item = layer.items[i];
+//   _calculateTouch(
+//     controller: controller,
+//     item: item,
+//     oldItem: (oldLayer?.items)?.getOrNull(i),
+//     painterData: painterData,
+//     weight: weight,
+//   );
+//   touchableShapes.add(
+//     RectangleShape<ChartLineDataItem>(
+//       data: item,
+//       rectOffset: item.currentTouchPos,
+//       rectSize: item.currentTouchSize,
+//     ),
+//   );
+// }
+  }
+
   /// Draw line.
   static void draw({
     required Canvas canvas,
@@ -28,7 +85,8 @@ class _ChartLinePainter {
         yValue: yValue,
       );
     }
-    _draw(canvas: canvas, layer: layer, painterData: painterData);
+
+    _drawPath(canvas: canvas, layer: layer, painterData: painterData);
 
     final double v1 = (layer.items.getOrNull(1)?.currentValuePos)?.dx ?? 0.0;
     final double v2 = (layer.items.firstOrNull?.currentValuePos)?.dx ?? 0.0;
@@ -108,10 +166,11 @@ class _ChartLinePainter {
     );
   }
 
-  static void _draw({
+  static Path _drawPath({
     required Canvas canvas,
     required ChartLineLayer layer,
     required ChartPainterData painterData,
+    Path? prePath,
   }) {
     final Paint paint = Paint()
       ..strokeWidth = layer.settings.thickness
@@ -134,10 +193,15 @@ class _ChartLinePainter {
       drawPath.lineTo(lastItem.currentValuePos.dx, bottomDy);
       drawPath.lineTo(firstItem.currentValuePos.dx, bottomDy);
       drawPath.close();
+      if (prePath != null) {
+        drawPath = Path.combine(PathOperation.difference, drawPath, prePath);
+      }
       paint.style = PaintingStyle.fill;
       paint.color = layer.settings.color.withAlpha(80);
       canvas.drawPath(drawPath, paint);
     }
+    drawPath = drawPath.shift(const Offset(0, -1));
+    return drawPath;
   }
 
   static Path _drawCurvePath({
@@ -154,32 +218,14 @@ class _ChartLinePainter {
       if (i < 1) {
         curvePath.moveTo(currentPos.dx, currentPos.dy);
       } else {
-        final Offset controlPos = Offset(
-          previousPos.dx + (currentPos.dx - previousPos.dx).half,
-          previousPos.dy,
-        );
-        final Offset controlPos2 = Offset(
-          currentPos.dx + (previousPos.dx - currentPos.dx).half,
-          currentPos.dy,
-        );
-        curvePath.cubicTo(
-          controlPos.dx,
-          controlPos.dy,
-          controlPos2.dx,
-          controlPos2.dy,
-          currentPos.dx,
-          currentPos.dy,
-        );
+        final Offset controlPos = Offset(previousPos.dx + (currentPos.dx - previousPos.dx).half, previousPos.dy);
+        final Offset controlPos2 = Offset(currentPos.dx + (previousPos.dx - currentPos.dx).half, currentPos.dy);
+
+        curvePath.cubicTo(controlPos.dx, controlPos.dy, controlPos2.dx, controlPos2.dy, currentPos.dx, currentPos.dy);
       }
       previousPos = currentPos;
     }
-    canvas.drawPath(
-      curvePath,
-      paint..color = layer.items.firstOrNull?.currentValueColor ?? Colors.transparent,
-    );
-    for (int i = 0; i < layer.items.length; i++) {
-      layer.settings.pointBuild?.call(layer.items[i].currentValuePos, canvas);
-    }
+    canvas.drawPath(curvePath, paint..color = layer.items.firstOrNull?.currentValueColor ?? Colors.transparent);
     return curvePath;
   }
 
@@ -195,20 +241,10 @@ class _ChartLinePainter {
       if (i < 1) {
         straightPath.moveTo(currentPos.dx, currentPos.dy);
       } else {
-        straightPath.lineTo(
-          currentPos.dx,
-          currentPos.dy,
-        );
+        straightPath.lineTo(currentPos.dx, currentPos.dy);
       }
     }
-    canvas.drawPath(
-      straightPath,
-      paint..color = layer.items.firstOrNull?.currentValueColor ?? Colors.transparent,
-    );
-
-    for (int i = 0; i < layer.items.length; i++) {
-      layer.settings.pointBuild?.call(layer.items[i].currentValuePos, canvas);
-    }
+    canvas.drawPath(straightPath, paint..color = layer.items.firstOrNull?.currentValueColor ?? Colors.transparent);
     return straightPath;
   }
 }

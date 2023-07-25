@@ -14,12 +14,12 @@ class ChartLineSettings {
   final bool useCurve;
 
   /// 是否先显示面积图
-  final bool useArea;
+  bool useArea;
 
   /// 点位显示的样式
   final PointBuild? pointBuild;
 
-  const ChartLineSettings({
+  ChartLineSettings({
     required this.color,
     required this.thickness,
     this.useCurve = true,

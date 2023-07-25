@@ -93,28 +93,71 @@ class _LinePageState extends State<LinePage> {
         labelX: (value) => DateFormat('yy').format(DateTime.fromMillisecondsSinceEpoch(value.toInt())),
         labelY: (value) => value.toInt().toString(),
       ),
-      ChartLineLayer(
-        items: List.generate(
-          4,
-          (index) => ChartLineDataItem(
-            x: (index * frequency) + from.millisecondsSinceEpoch,
-            value: index * 100,
+      ChartLineStackLayer([
+        ChartLineLayer(
+          items: List.generate(
+            4,
+            (index) => ChartLineDataItem(
+              x: (index * frequency) + from.millisecondsSinceEpoch,
+              value: index * 20 + Random().nextDouble() * 20,
+            ),
+          ),
+          settings: ChartLineSettings(
+            color: const Color(0xFF8043F9),
+            thickness: 2.0,
+            useCurve: false,
+            pointBuild: (offset, canvas) {
+              Paint paint = Paint()
+                ..strokeJoin = StrokeJoin.round
+                ..strokeWidth = 1
+                ..color = const Color(0xFFF9B043);
+              canvas.drawCircle(offset, 2, paint);
+            },
           ),
         ),
-        settings: ChartLineSettings(
-          color: const Color(0xFF8043F9),
-          thickness: 2.0,
-          useCurve: false,
-          useArea: true,
-          pointBuild: (offset, canvas) {
-            Paint paint = Paint()
-              ..strokeJoin = StrokeJoin.round
-              ..strokeWidth = 1
-              ..color = const Color(0xFFF9B043);
-            canvas.drawCircle(offset, 2, paint);
-          },
+        ChartLineLayer(
+          items: List.generate(
+            4,
+            (index) => ChartLineDataItem(
+              x: (index * frequency) + from.millisecondsSinceEpoch,
+              value: index * 30 + Random().nextDouble() * 20,
+            ),
+          ),
+          settings: ChartLineSettings(
+            color: const Color(0xFFF96D43),
+            thickness: 2.0,
+            useCurve: false,
+            pointBuild: (offset, canvas) {
+              Paint paint = Paint()
+                ..strokeJoin = StrokeJoin.round
+                ..strokeWidth = 1
+                ..color = const Color(0xFFAEEF2C);
+              canvas.drawCircle(offset, 2, paint);
+            },
+          ),
         ),
-      ),
+        ChartLineLayer(
+          items: List.generate(
+            4,
+                (index) => ChartLineDataItem(
+              x: (index * frequency) + from.millisecondsSinceEpoch,
+              value: index * 30 + Random().nextDouble() * 20,
+            ),
+          ),
+          settings: ChartLineSettings(
+            color: const Color(0xFF43F9B3),
+            thickness: 2.0,
+            useCurve: false,
+            pointBuild: (offset, canvas) {
+              Paint paint = Paint()
+                ..strokeJoin = StrokeJoin.round
+                ..strokeWidth = 1
+                ..color = const Color(0xFF2C6AEF);
+              canvas.drawCircle(offset, 2, paint);
+            },
+          ),
+        ),
+      ]),
       ChartTooltipLayer(
         shape: () => ChartTooltipLineShape<ChartLineDataItem>(
           backgroundColor: Colors.white,

@@ -3,7 +3,7 @@ part of 'chart_line_layer.dart';
 /// A collection of values for a line in a chart.
 class ChartLineDataItem extends ChartDataItem {
   /// The value of data item.
-  final double value;
+  double value;
 
   /// The axis x of data item.
   final double x;

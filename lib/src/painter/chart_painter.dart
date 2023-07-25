@@ -21,14 +21,24 @@ import 'package:mrx_charts/src/models/touchable/touchable_shape.dart';
 import 'package:mrx_charts/src/touch/chart_touch_callback_data.dart';
 import 'package:flutter/material.dart';
 
+import '../../mrx_charts.dart';
+
 part 'chart_axis_painter.dart';
+
 part 'chart_bar_painter.dart';
+
 part 'chart_candle_painter.dart';
+
 part 'chart_grid_painter.dart';
+
 part 'chart_group_bar_painter.dart';
+
 part 'chart_group_pie_painter.dart';
+
 part 'chart_highlight_painter.dart';
+
 part 'chart_line_painter.dart';
+
 part 'chart_tooltip_painter.dart';
 
 typedef UpdateTouchableShapesCallback = void Function(List<TouchableShape<ChartDataItem>> touchableShapes);
@@ -123,6 +133,17 @@ class ChartPainter extends CustomPainter {
           controller: controller,
           layer: layer,
           oldLayer: oldLayer is ChartLineLayer ? oldLayer : null,
+          painterData: _sheetPainterData,
+          touchableShapes: touchableShapes,
+          xValue: xValue,
+          yValue: yValue,
+        );
+      } else if (layer is ChartLineStackLayer) {
+        _ChartLinePainter.drawStack(
+          canvas: canvas,
+          controller: controller,
+          layer: layer,
+          oldLayer: oldLayer is ChartLineStackLayer ? oldLayer : null,
           painterData: _sheetPainterData,
           touchableShapes: touchableShapes,
           xValue: xValue,
