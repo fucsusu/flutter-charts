@@ -105,6 +105,7 @@ class _LinePageState extends State<LinePage> {
           settings: ChartLineSettings(
             color: const Color(0xFF8043F9),
             thickness: 2.0,
+            name: "index1",
             useCurve: false,
             pointBuild: (offset, canvas) {
               Paint paint = Paint()
@@ -127,6 +128,7 @@ class _LinePageState extends State<LinePage> {
             color: const Color(0xFFF96D43),
             thickness: 2.0,
             useCurve: false,
+            name: "index2",
             pointBuild: (offset, canvas) {
               Paint paint = Paint()
                 ..strokeJoin = StrokeJoin.round
@@ -139,7 +141,7 @@ class _LinePageState extends State<LinePage> {
         ChartLineLayer(
           items: List.generate(
             4,
-                (index) => ChartLineDataItem(
+            (index) => ChartLineDataItem(
               x: (index * frequency) + from.millisecondsSinceEpoch,
               value: index * 30 + Random().nextDouble() * 20,
             ),
@@ -147,6 +149,7 @@ class _LinePageState extends State<LinePage> {
           settings: ChartLineSettings(
             color: const Color(0xFF43F9B3),
             thickness: 2.0,
+            name: "index3",
             useCurve: false,
             pointBuild: (offset, canvas) {
               Paint paint = Paint()

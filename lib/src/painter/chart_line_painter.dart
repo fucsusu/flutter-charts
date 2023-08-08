@@ -15,16 +15,23 @@ class _ChartLinePainter {
     required ChartAxisValue yValue,
     ChartLineStackLayer? oldLayer,
   }) {
+    Paint tipsPaint = Paint()
+      ..color = Colors.white
+      ..style = PaintingStyle.stroke;
     if (layer.items.isNotEmpty) {
       Path? prePath;
-      for (var lineLayer in layer.items) {
+      Offset tipsOffset = Offset(painterData.position.dx, topDataTypeHeight / 2);
+
+      for (int i = 0; i < layer.items.length; i++) {
+        ChartLineLayer lineLayer = layer.items[i];
+
         for (int j = 0; j < lineLayer.items.length; j++) {
           ChartLineDataItem item = lineLayer.items[j];
           _calculate(
             controller: controller,
             item: item,
-            oldItem: lineLayer.items.getOrNull(j),
-            oldLayer: lineLayer,
+            oldItem: oldLayer?.items[i].items.getOrNull(j),
+            oldLayer: oldLayer?.items[i],
             painterData: painterData,
             settings: lineLayer.settings,
             xValue: xValue,
@@ -33,32 +40,51 @@ class _ChartLinePainter {
         }
         prePath = _drawPath(canvas: canvas, layer: lineLayer, painterData: painterData, prePath: prePath);
 
-        /// 绘制点位
         for (int i = 0; i < lineLayer.items.length; i++) {
+          /// 绘制点位
           lineLayer.settings.pointBuild?.call(lineLayer.items[i].currentValuePos, canvas);
         }
+
+        /// 绘制顶部示例
+        tipsOffset = _drawTopExample(canvas, painterData, tipsPaint, lineLayer, tipsOffset);
+      }
+
+      ///绘制辅助线
+      Paint paint = Paint()
+        ..color = Colors.white
+        ..style = PaintingStyle.stroke;
+
+      canvas.drawCircle(painterData.position, 3, paint);
+      canvas.drawRect(
+          Rect.fromPoints(
+              painterData.position, painterData.position + Offset(painterData.size.width, painterData.size.height)),
+          paint);
+
+      ChartLineLayer lineLayer = layer.items.first;
+
+      /// 计算点击范围
+      final double v1 = (lineLayer.items.getOrNull(1)?.currentValuePos)?.dx ?? 0.0;
+      final double v2 = (lineLayer.items.firstOrNull?.currentValuePos)?.dx ?? 0.0;
+      final double weight = (max(v1, v2) - min(v1, v2)) * 0.9;
+
+      for (int i = 0; i < lineLayer.items.length; i++) {
+        final ChartLineDataItem item = lineLayer.items[i];
+        _calculateTouch(
+          controller: controller,
+          item: item,
+          oldItem: oldLayer?.items[i].items.getOrNull(i),
+          painterData: painterData,
+          weight: weight,
+        );
+        touchableShapes.add(
+          RectangleShape<ChartLineDataItem>(
+            data: item,
+            rectOffset: item.currentTouchPos,
+            rectSize: item.currentTouchSize,
+          ),
+        );
       }
     }
-// final double v1 = (layer.items.getOrNull(1)?.currentValuePos)?.dx ?? 0.0;
-// final double v2 = (layer.items.firstOrNull?.currentValuePos)?.dx ?? 0.0;
-// final double weight = (max(v1, v2) - min(v1, v2)) * 0.9;
-// for (int i = 0; i < layer.items.length; i++) {
-//   final ChartLineDataItem item = layer.items[i];
-//   _calculateTouch(
-//     controller: controller,
-//     item: item,
-//     oldItem: (oldLayer?.items)?.getOrNull(i),
-//     painterData: painterData,
-//     weight: weight,
-//   );
-//   touchableShapes.add(
-//     RectangleShape<ChartLineDataItem>(
-//       data: item,
-//       rectOffset: item.currentTouchPos,
-//       rectSize: item.currentTouchSize,
-//     ),
-//   );
-// }
   }
 
   /// Draw line.
@@ -88,9 +114,11 @@ class _ChartLinePainter {
 
     _drawPath(canvas: canvas, layer: layer, painterData: painterData);
 
+    /// 计算点击位置宽度
     final double v1 = (layer.items.getOrNull(1)?.currentValuePos)?.dx ?? 0.0;
     final double v2 = (layer.items.firstOrNull?.currentValuePos)?.dx ?? 0.0;
     final double weight = (max(v1, v2) - min(v1, v2)) * 0.9;
+
     for (int i = 0; i < layer.items.length; i++) {
       final ChartLineDataItem item = layer.items[i];
       _calculateTouch(
@@ -246,5 +274,23 @@ class _ChartLinePainter {
     }
     canvas.drawPath(straightPath, paint..color = layer.items.firstOrNull?.currentValueColor ?? Colors.transparent);
     return straightPath;
+  }
+
+  /// 绘制顶部示例
+  static Offset _drawTopExample(
+      Canvas canvas, ChartPainterData painterData, Paint tipsPaint, ChartLineLayer lineLayer, Offset offset) {
+    tipsPaint.color = lineLayer.settings.color;
+    tipsPaint.strokeWidth = 2;
+    canvas.drawLine(offset + const Offset(0, 5), offset + const Offset(10, 5), tipsPaint);
+    TextPainter textPainter = TextPainter(
+      text: TextSpan(
+        text: lineLayer.settings.name,
+        style: lineLayer.settings.nameStyle,
+      ),
+      textDirection: TextDirection.ltr,
+    )..layout();
+    textPainter.paint(canvas, offset + const Offset(15, 0));
+    offset = offset + Offset(20 + textPainter.width, 0);
+    return offset;
   }
 }

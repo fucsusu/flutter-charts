@@ -13,6 +13,12 @@ class ChartLineSettings {
   /// 是否拐点是否使用平滑曲线
   final bool useCurve;
 
+  /// 数据名称
+  final String name;
+
+  /// 数据名称
+  final TextStyle nameStyle;
+
   /// 是否先显示面积图
   bool useArea;
 
@@ -23,6 +29,11 @@ class ChartLineSettings {
     required this.color,
     required this.thickness,
     this.useCurve = true,
+    this.name = "",
+    this.nameStyle = const TextStyle(
+      color: Colors.white54,
+      fontSize: 10.0,
+    ),
     this.useArea = false,
     this.pointBuild,
   });

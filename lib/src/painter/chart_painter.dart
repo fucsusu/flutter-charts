@@ -1,24 +1,5 @@
 import 'dart:math';
 
-import 'package:mrx_charts/src/models/axis/chart_axis_layer.dart';
-import 'package:mrx_charts/src/models/bar/chart_bar_layer.dart';
-import 'package:mrx_charts/src/models/candle/chart_candle_layer.dart';
-import 'package:mrx_charts/src/models/chart_axis_value.dart';
-import 'package:mrx_charts/src/models/chart_data_item.dart';
-import 'package:mrx_charts/src/models/chart_layer.dart';
-import 'package:mrx_charts/src/models/chart_painter_data.dart';
-import 'package:mrx_charts/src/models/grid/chart_grid_layer.dart';
-import 'package:mrx_charts/src/models/group/bar/chart_group_bar_layer.dart';
-import 'package:mrx_charts/src/models/group/pie/chart_group_pie_layer.dart';
-import 'package:mrx_charts/src/models/highlight/chart_highlight_layer.dart';
-import 'package:mrx_charts/src/models/highlight/shape/chart_highlight_shape.dart';
-import 'package:mrx_charts/src/models/line/chart_line_layer.dart';
-import 'package:mrx_charts/src/models/tooltip/chart_tooltip_layer.dart';
-import 'package:mrx_charts/src/models/tooltip/shape/chart_tooltip_shape.dart';
-import 'package:mrx_charts/src/models/touchable/arc_shape.dart';
-import 'package:mrx_charts/src/models/touchable/rectangle_shape.dart';
-import 'package:mrx_charts/src/models/touchable/touchable_shape.dart';
-import 'package:mrx_charts/src/touch/chart_touch_callback_data.dart';
 import 'package:flutter/material.dart';
 
 import '../../mrx_charts.dart';
@@ -42,6 +23,9 @@ part 'chart_line_painter.dart';
 part 'chart_tooltip_painter.dart';
 
 typedef UpdateTouchableShapesCallback = void Function(List<TouchableShape<ChartDataItem>> touchableShapes);
+
+/// 数据类型显示区域
+int topDataTypeHeight = 30;
 
 /// Provides chart painter.
 class ChartPainter extends CustomPainter {
@@ -95,6 +79,7 @@ class ChartPainter extends CustomPainter {
         min: axisLayer.y.min,
       );
     }
+
     for (int i = 0; i < layers.length; i++) {
       final ChartLayer layer = layers[i];
       final ChartLayer? oldLayer = oldLayers?.getOrNull(i);
@@ -228,10 +213,15 @@ class ChartPainter extends CustomPainter {
           0.0,
     );
 
+    /// 是否是堆积图
+    bool hasStackLayer = layers.firstWhereOrNull((element) => element is ChartLineStackLayer) != null;
+
     _sheetPainterData = ChartPainterData(
       position: Offset(
         maxAxisYWidth + axisXTextPainterFirstWidth.half + paddingHorizontal.left.half + padding.left,
-        axisYTextPainterLastHeight.half + padding.top,
+        hasStackLayer
+            ? axisYTextPainterLastHeight.half + padding.top + topDataTypeHeight
+            : axisYTextPainterLastHeight.half + padding.top,
       ),
       size: Size(
         size.width -
@@ -240,9 +230,15 @@ class ChartPainter extends CustomPainter {
             axisXTextPainterLastWidth.half -
             paddingHorizontal.horizontal.half -
             padding.horizontal,
-        size.height - maxAxisXHeight - axisYTextPainterLastHeight.half - axisYTextPainterFirstHeight.half - padding.vertical,
+        size.height -
+            maxAxisXHeight -
+            axisYTextPainterLastHeight.half -
+            axisYTextPainterFirstHeight.half -
+            padding.vertical -
+            topDataTypeHeight,
       ),
     );
+
     _axisXPainterData = ChartPainterData(
       position: Offset(
         _sheetPainterData.position.dx,
