@@ -39,8 +39,7 @@ class ChartTooltipPieShape<T extends ChartDataItem> extends ChartTooltipShape {
 
   /// Draw tooltip pie shape.
   @override
-  void draw(Canvas canvas, ChartPainterData painterData,
-      ChartTouchCallbackData touchedData, double tolerance) {
+  void draw(Canvas canvas, ChartPainterData painterData, ChartTouchCallbackData touchedData, double tolerance) {
     final T item = touchedData.selectedItem as T;
     final TextPainter namePainter = TextPainter(
       text: TextSpan(
@@ -57,12 +56,8 @@ class ChartTooltipPieShape<T extends ChartDataItem> extends ChartTooltipShape {
       textDirection: TextDirection.ltr,
     )..layout();
     final Offset position = Offset(
-      (touchedData.clickedPos?.dx ?? 0.0) -
-          max(namePainter.width, valuePainter.width) / 2.0 -
-          padding.horizontal / 2.0,
-      (touchedData.clickedPos?.dy ?? 0.0) -
-          (namePainter.height + valuePainter.height) / 2.0 -
-          padding.vertical / 2.0,
+      (touchedData.clickedPos?.dx ?? 0.0) - max(namePainter.width, valuePainter.width) / 2.0 - padding.horizontal / 2.0,
+      (touchedData.clickedPos?.dy ?? 0.0) - (namePainter.height + valuePainter.height) / 2.0 - padding.vertical / 2.0,
     );
     final Size size = Size(
       max(namePainter.width, valuePainter.width) + padding.horizontal,

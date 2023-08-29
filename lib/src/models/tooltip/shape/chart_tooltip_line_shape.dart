@@ -30,7 +30,7 @@ class ChartTooltipLineShape<T extends ChartDataItem> extends ChartTooltipShape {
   final double marginBottom;
 
   /// The return return text value of shape.
-  final String Function(T) onTextValue;
+  final String Function(String?, T) onTextValue;
 
   /// The padding of shape.
   ///
@@ -67,16 +67,13 @@ class ChartTooltipLineShape<T extends ChartDataItem> extends ChartTooltipShape {
 
   /// Draw tooltip line shape.
   @override
-  void draw(Canvas canvas, ChartPainterData painterData,
-      ChartTouchCallbackData touchedData, double tolerance) {
+  void draw(Canvas canvas, ChartPainterData painterData, ChartTouchCallbackData touchedData, double tolerance) {
     final T item = touchedData.selectedItem as T;
     final Offset currentValuePos = currentPos(item);
+
     final Offset itemPos = Offset(currentValuePos.dx, currentValuePos.dy);
     final TextPainter textPainter = TextPainter(
-      text: TextSpan(
-        text: onTextValue(item),
-        style: textStyle,
-      ),
+      text: TextSpan(text: onTextValue(item.key, item), style: textStyle),
       textDirection: TextDirection.ltr,
     )..layout();
     final Offset pos = Offset(
@@ -98,27 +95,17 @@ class ChartTooltipLineShape<T extends ChartDataItem> extends ChartTooltipShape {
     final Offset offsetRectAndText = Offset(
       painterData.position.dx - tolerance > rectPos.dx
           ? -(painterData.position.dx - tolerance - rectPos.dx)
-          : painterData.position.dx + tolerance + painterData.size.width <
-                  rectPos.dx + rectSize.width
-              ? -(painterData.position.dx +
-                  painterData.size.width +
-                  tolerance -
-                  rectPos.dx -
-                  rectSize.width)
+          : painterData.position.dx + tolerance + painterData.size.width < rectPos.dx + rectSize.width
+              ? -(painterData.position.dx + painterData.size.width + tolerance - rectPos.dx - rectSize.width)
               : 0.0,
       rectPos.dy < 0.0
-          ? rectPos.dy -
-              currentValuePos.dy -
-              (marginBottom + circleBorderThickness + circleSize) -
-              triangleSideLength * 0.5
+          ? rectPos.dy - currentValuePos.dy - (marginBottom + circleBorderThickness + circleSize) - triangleSideLength * 0.5
           : 0.0,
     );
     final Path rectanglePath = Path()
       ..addRRect(
         RRect.fromRectAndRadius(
-          Offset(rectPos.dx - offsetRectAndText.dx,
-                  rectPos.dy - offsetRectAndText.dy) &
-              rectSize,
+          Offset(rectPos.dx - offsetRectAndText.dx, rectPos.dy - offsetRectAndText.dy) & rectSize,
           Radius.circular(radius),
         ),
       );
@@ -139,10 +126,7 @@ class ChartTooltipLineShape<T extends ChartDataItem> extends ChartTooltipShape {
         )
         ..lineTo(
           triangleCenterPos.dx,
-          triangleCenterPos.dy -
-              rectSize.height -
-              triangleSideLength * 0.5 +
-              1.0,
+          triangleCenterPos.dy - rectSize.height - triangleSideLength * 0.5 + 1.0,
         )
         ..close();
     } else {

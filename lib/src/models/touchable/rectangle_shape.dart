@@ -10,13 +10,17 @@ class RectangleShape<T> extends TouchableShape<T> {
   /// The size of rectangle.
   final Size rectSize;
 
+  final List<T> dataList;
+
   RectangleShape({
     required this.rectOffset,
     required this.rectSize,
-    required T data,
-  }) : super(
-          data: data,
-        );
+    this.dataList = const [],
+  });
+
+  void addItem(T t) {
+    dataList.add(t);
+  }
 
   /// Check rectangle has been clicked.
   @override
@@ -32,15 +36,13 @@ class RectangleShape<T> extends TouchableShape<T> {
     if (other is! RectangleShape) {
       return false;
     }
-    return rectOffset == other.rectOffset &&
-        rectSize == other.rectSize &&
-        data == other.data;
+    return rectOffset == other.rectOffset && rectSize == other.rectSize && dataList == other.dataList;
   }
 
   @override
   int get hashCode => Object.hashAll([
         rectOffset,
         rectSize,
-        data,
+        dataList,
       ]);
 }

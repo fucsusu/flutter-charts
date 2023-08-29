@@ -38,7 +38,7 @@ class _ChartBarPainter {
       );
       touchableShapes.add(
         RectangleShape<ChartBarDataItem>(
-          data: item,
+          dataList: [item],
           rectOffset: item.currentTouchPos,
           rectSize: item.currentTouchSize,
         ),
@@ -55,14 +55,10 @@ class _ChartBarPainter {
     required ChartAxisValue yValue,
     ChartBarDataItem? oldItem,
   }) {
-    final double offsetX = painterData.size.width *
-        (item.x - xValue.min) /
-        (xValue.max - xValue.min);
+    final double offsetX = painterData.size.width * (item.x - xValue.min) / (xValue.max - xValue.min);
     final Size size = Size(
       settings.thickness,
-      painterData.size.height *
-          (item.value - yValue.min) /
-          (yValue.max - yValue.min),
+      painterData.size.height * (item.value - yValue.min) / (yValue.max - yValue.min),
     );
     final Offset pos = Offset(
       painterData.position.dx + offsetX - size.width.half,
@@ -72,18 +68,15 @@ class _ChartBarPainter {
       color: item.color,
       controller: controller,
       initialColor: oldItem?.lastValueColor ?? Colors.transparent,
-      initialPos: oldItem?.lastValuePos ??
-          Offset(pos.dx, painterData.position.dy + painterData.size.height),
+      initialPos: oldItem?.lastValuePos ?? Offset(pos.dx, painterData.position.dy + painterData.size.height),
       initialSize: oldItem?.lastValueSize ?? Size(size.width, 0.0),
       pos: pos,
       size: size,
     );
     item.setupTouch(
       controller: controller,
-      initialPos:
-          oldItem?.lastValuePos ?? Offset(pos.dx, painterData.position.dy),
-      initialSize:
-          oldItem?.lastValueSize ?? Size(size.width, painterData.size.height),
+      initialPos: oldItem?.lastValuePos ?? Offset(pos.dx, painterData.position.dy),
+      initialSize: oldItem?.lastValueSize ?? Size(size.width, painterData.size.height),
       pos: Offset(pos.dx, painterData.position.dy),
       size: Size(size.width, painterData.size.height),
     );

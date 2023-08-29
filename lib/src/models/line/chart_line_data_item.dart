@@ -14,8 +14,9 @@ class ChartLineDataItem extends ChartDataItem {
   ChartLineDataItem({
     required this.value,
     required this.x,
+    String? key,
   })  : _touch = _ChartLineDataItemTouch(),
-        _value = _ChartLineDataItemValue();
+        _value = _ChartLineDataItemValue(),super(key: key);
 
   /// Current touch area position during the animation.
   ///

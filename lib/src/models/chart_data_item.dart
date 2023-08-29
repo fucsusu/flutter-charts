@@ -1,6 +1,8 @@
 /// Abstract class for data item.
 abstract class ChartDataItem {
-  const ChartDataItem();
+  ChartDataItem({this.key});
+
+  String? key;
 
   /// Dispose all animations.
   void dispose();

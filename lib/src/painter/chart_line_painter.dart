@@ -21,6 +21,7 @@ class _ChartLinePainter {
     if (layer.items.isNotEmpty) {
       Path? prePath;
       Offset tipsOffset = Offset(painterData.position.dx, topDataTypeHeight / 2);
+      Map<int, TouchableShape<ChartDataItem>> touchableShapesTemp = {};
 
       for (int i = 0; i < layer.items.length; i++) {
         ChartLineLayer lineLayer = layer.items[i];
@@ -47,7 +48,33 @@ class _ChartLinePainter {
 
         /// 绘制顶部示例
         tipsOffset = _drawTopExample(canvas, painterData, tipsPaint, lineLayer, tipsOffset);
+
+        /// 计算点击范围
+        final double v1 = (lineLayer.items.getOrNull(1)?.currentValuePos)?.dx ?? 0.0;
+        final double v2 = (lineLayer.items.firstOrNull?.currentValuePos)?.dx ?? 0.0;
+        final double weight = (max(v1, v2) - min(v1, v2)) * 0.9;
+
+        for (int i = 0; i < lineLayer.items.length; i++) {
+          final ChartLineDataItem item = lineLayer.items[i];
+          _calculateTouch(
+            controller: controller,
+            item: item,
+            oldItem: oldLayer?.items[i].items.getOrNull(i),
+            painterData: painterData,
+            weight: weight,
+          );
+
+          if (touchableShapesTemp.keys.contains(i)) {
+            (touchableShapesTemp[i] as RectangleShape).addItem(item);
+          } else {
+            touchableShapesTemp.putIfAbsent(
+                i,
+                () => RectangleShape<ChartLineDataItem>(
+                    dataList: [item], rectOffset: item.currentTouchPos, rectSize: item.currentTouchSize));
+          }
+        }
       }
+      touchableShapes.addAll(touchableShapesTemp.values);
 
       ///绘制辅助线
       Paint paint = Paint()
@@ -59,31 +86,6 @@ class _ChartLinePainter {
           Rect.fromPoints(
               painterData.position, painterData.position + Offset(painterData.size.width, painterData.size.height)),
           paint);
-
-      ChartLineLayer lineLayer = layer.items.first;
-
-      /// 计算点击范围
-      final double v1 = (lineLayer.items.getOrNull(1)?.currentValuePos)?.dx ?? 0.0;
-      final double v2 = (lineLayer.items.firstOrNull?.currentValuePos)?.dx ?? 0.0;
-      final double weight = (max(v1, v2) - min(v1, v2)) * 0.9;
-
-      for (int i = 0; i < lineLayer.items.length; i++) {
-        final ChartLineDataItem item = lineLayer.items[i];
-        _calculateTouch(
-          controller: controller,
-          item: item,
-          oldItem: oldLayer?.items[i].items.getOrNull(i),
-          painterData: painterData,
-          weight: weight,
-        );
-        touchableShapes.add(
-          RectangleShape<ChartLineDataItem>(
-            data: item,
-            rectOffset: item.currentTouchPos,
-            rectSize: item.currentTouchSize,
-          ),
-        );
-      }
     }
   }
 
@@ -130,7 +132,7 @@ class _ChartLinePainter {
       );
       touchableShapes.add(
         RectangleShape<ChartLineDataItem>(
-          data: item,
+          dataList: [item],
           rectOffset: item.currentTouchPos,
           rectSize: item.currentTouchSize,
         ),

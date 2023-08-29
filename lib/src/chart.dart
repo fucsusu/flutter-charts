@@ -86,7 +86,7 @@ class _ChartState extends State<Chart> with TickerProviderStateMixin {
         Expanded(
           child: AnimatedBuilder(
             animation: _controller,
-            builder: (_, __) => ChartTouchDetector<dynamic>(
+            builder: (_, __) => ChartTouchDetector<ChartDataItem>(
               onShapes: () => _touchableShapes,
               onTap: ((touchPosition, data) => setState(() {
                     _touchedData = data == null
@@ -101,8 +101,7 @@ class _ChartState extends State<Chart> with TickerProviderStateMixin {
                   controller: _controller,
                   layers: widget.layers,
                   oldLayers: oldLayers,
-                  onUpdateTouchableShapes: (shapes) =>
-                      _touchableShapes = shapes,
+                  onUpdateTouchableShapes: (shapes) => _touchableShapes = shapes,
                   padding: widget.padding,
                   touchedData: _touchedData,
                 ),

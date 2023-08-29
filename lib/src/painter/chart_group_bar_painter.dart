@@ -64,7 +64,7 @@ class _ChartGroupBarPainter {
         );
         touchableShapes.add(
           RectangleShape<ChartGroupBarDataItem>(
-            data: item,
+            dataList: [item],
             rectOffset: item.currentTouchPos,
             rectSize: item.currentTouchSize,
           ),

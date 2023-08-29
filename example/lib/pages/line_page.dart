@@ -98,8 +98,9 @@ class _LinePageState extends State<LinePage> {
           items: List.generate(
             4,
             (index) => ChartLineDataItem(
+              key: "index1",
               x: (index * frequency) + from.millisecondsSinceEpoch,
-              value: index * 20 + Random().nextDouble() * 20,
+              value: index * 20 + Random().nextInt(40).toDouble(),
             ),
           ),
           settings: ChartLineSettings(
@@ -120,8 +121,9 @@ class _LinePageState extends State<LinePage> {
           items: List.generate(
             4,
             (index) => ChartLineDataItem(
+              key: "index2",
               x: (index * frequency) + from.millisecondsSinceEpoch,
-              value: index * 30 + Random().nextDouble() * 20,
+              value: index * 30 + Random().nextInt(40).toDouble(),
             ),
           ),
           settings: ChartLineSettings(
@@ -142,8 +144,9 @@ class _LinePageState extends State<LinePage> {
           items: List.generate(
             4,
             (index) => ChartLineDataItem(
+              key: "index3",
               x: (index * frequency) + from.millisecondsSinceEpoch,
-              value: index * 30 + Random().nextDouble() * 20,
+              value: index * 30 + Random().nextInt(40).toDouble(),
             ),
           ),
           settings: ChartLineSettings(
@@ -169,7 +172,7 @@ class _LinePageState extends State<LinePage> {
           circleSize: 4.0,
           circleBorderThickness: 2.0,
           currentPos: (item) => item.currentValuePos,
-          onTextValue: (item) => '€${item.value.toString()}',
+          onTextValue: (key, item) => '$key:€${item.value.toString()}',
           marginBottom: 6.0,
           padding: const EdgeInsets.symmetric(
             horizontal: 12.0,
