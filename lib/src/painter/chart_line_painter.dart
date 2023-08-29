@@ -54,21 +54,21 @@ class _ChartLinePainter {
         final double v2 = (lineLayer.items.firstOrNull?.currentValuePos)?.dx ?? 0.0;
         final double weight = (max(v1, v2) - min(v1, v2)) * 0.9;
 
-        for (int i = 0; i < lineLayer.items.length; i++) {
-          final ChartLineDataItem item = lineLayer.items[i];
+        for (int j = 0; j < lineLayer.items.length; j++) {
+          final ChartLineDataItem item = lineLayer.items[j];
           _calculateTouch(
             controller: controller,
             item: item,
-            oldItem: oldLayer?.items[i].items.getOrNull(i),
+            oldItem: oldLayer?.items[i].items.getOrNull(j),
             painterData: painterData,
             weight: weight,
           );
 
-          if (touchableShapesTemp.keys.contains(i)) {
-            (touchableShapesTemp[i] as RectangleShape).addItem(item);
+          if (touchableShapesTemp.keys.contains(j)) {
+            (touchableShapesTemp[j] as RectangleShape).addItem(item);
           } else {
             touchableShapesTemp.putIfAbsent(
-                i,
+                j,
                 () => RectangleShape<ChartLineDataItem>(
                     dataList: [item], rectOffset: item.currentTouchPos, rectSize: item.currentTouchSize));
           }
