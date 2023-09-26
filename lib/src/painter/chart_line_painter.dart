@@ -77,15 +77,15 @@ class _ChartLinePainter {
       touchableShapes.addAll(touchableShapesTemp.values);
 
       ///绘制辅助线
-      Paint paint = Paint()
-        ..color = Colors.white
-        ..style = PaintingStyle.stroke;
-
-      canvas.drawCircle(painterData.position, 3, paint);
-      canvas.drawRect(
-          Rect.fromPoints(
-              painterData.position, painterData.position + Offset(painterData.size.width, painterData.size.height)),
-          paint);
+      // Paint paint = Paint()
+      //   ..color = Colors.white
+      //   ..style = PaintingStyle.stroke;
+      //
+      // canvas.drawCircle(painterData.position, 3, paint);
+      // canvas.drawRect(
+      //     Rect.fromPoints(
+      //         painterData.position, painterData.position + Offset(painterData.size.width, painterData.size.height)),
+      //     paint);
     }
   }
 

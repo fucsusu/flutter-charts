@@ -26,6 +26,19 @@ class _ChartBarPainter {
         xValue: xValue,
         yValue: yValue,
       );
+      if (layer.settings.background != null) {
+        canvas.drawRRect(
+          RRect.fromRectAndCorners(
+            Offset(item.currentValuePos.dx, painterData.position.dy) &
+                Size(layer.settings.thickness, painterData.size.height),
+            bottomLeft: layer.settings.radius.bottomLeft,
+            bottomRight: layer.settings.radius.bottomRight,
+            topLeft: layer.settings.radius.topLeft,
+            topRight: layer.settings.radius.topRight,
+          ),
+          Paint()..color = layer.settings.background!,
+        );
+      }
       canvas.drawRRect(
         RRect.fromRectAndCorners(
           item.currentValuePos & item.currentValueSize,

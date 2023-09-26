@@ -130,7 +130,7 @@ class _ChartAxisPainter {
       linePaint.color = settings.axisColor;
       linePaint.strokeWidth = 1;
       linePaint.style = PaintingStyle.stroke;
-      double bottomDy = sheetPainterData.size.height + sheetPainterData.position.dy;
+      double bottomDy = sheetPainterData.size.height + sheetPainterData.position.dy + 1;
 
       // canvas.drawCircle(sheetPainterData.position, 5, linePaint);
       // canvas.drawRect(

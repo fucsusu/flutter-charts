@@ -12,8 +12,12 @@ class ChartBarSettings {
   /// Defaults to BorderRadius.zero
   final double thickness;
 
+  ///背景颜色
+  final Color? background;
+
   const ChartBarSettings({
     this.thickness = 4.0,
     this.radius = BorderRadius.zero,
+    this.background,
   });
 }
