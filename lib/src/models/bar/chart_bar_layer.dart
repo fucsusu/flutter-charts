@@ -4,6 +4,7 @@ import 'package:mrx_charts/src/models/chart_layer.dart';
 import 'package:flutter/material.dart';
 
 part 'chart_bar_data_item.dart';
+
 part 'chart_bar_settings.dart';
 
 /// This layer allows to render bars.
@@ -14,10 +15,38 @@ class ChartBarLayer extends ChartLayer {
   /// The settings of bars.
   final ChartBarSettings settings;
 
-  const ChartBarLayer({
+  ChartBarLayer({
     required this.items,
     required this.settings,
-  });
+  }) {
+    if (settings.waterfallMode) {
+      if (settings.direction == WaterfallBarDirection.toRight) {
+        double total = 0;
+        for (var element in items) {
+          total += element.value;
+        }
+        items.add(ChartBarDataItem(
+          color: Colors.accents[items.length],
+          value: total,
+          x: items.length.toDouble(),
+        ));
+      } else if (settings.direction == WaterfallBarDirection.toLeft) {
+        double total = 0;
+        for (var element in items) {
+          total += element.value;
+          element.x = element.x + 1;
+        }
+
+        items.insert(
+            0,
+            ChartBarDataItem(
+              color: Colors.accents[items.length + 1],
+              value: total,
+              x: 0,
+            ));
+      }
+    }
+  }
 
   /// Disposing all animations.
   @override

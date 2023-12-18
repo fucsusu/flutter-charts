@@ -15,6 +15,7 @@ class _ChartBarPainter {
     required ChartAxisValue yValue,
     ChartBarLayer? oldLayer,
   }) {
+    double beforeTotalHeight = 0;
     for (int i = 0; i < layer.items.length; i++) {
       final ChartBarDataItem item = layer.items[i];
       _calculate(
@@ -26,22 +27,11 @@ class _ChartBarPainter {
         xValue: xValue,
         yValue: yValue,
       );
-      if (layer.settings.background != null) {
-        canvas.drawRRect(
-          RRect.fromRectAndCorners(
-            Offset(item.currentValuePos.dx, painterData.position.dy) &
-                Size(layer.settings.thickness, painterData.size.height),
-            bottomLeft: layer.settings.radius.bottomLeft,
-            bottomRight: layer.settings.radius.bottomRight,
-            topLeft: layer.settings.radius.topLeft,
-            topRight: layer.settings.radius.topRight,
-          ),
-          Paint()..color = layer.settings.background!,
-        );
-      }
+      _drawBarBackground(layer, canvas, item, painterData);
+
       canvas.drawRRect(
         RRect.fromRectAndCorners(
-          item.currentValuePos & item.currentValueSize,
+          item.currentValuePos.translate(0, -beforeTotalHeight) & item.currentValueSize,
           bottomLeft: layer.settings.radius.bottomLeft,
           bottomRight: layer.settings.radius.bottomRight,
           topLeft: layer.settings.radius.topLeft,
@@ -49,16 +39,15 @@ class _ChartBarPainter {
         ),
         Paint()..color = item.currentValueColor,
       );
-      touchableShapes.add(
-        RectangleShape<ChartBarDataItem>(
-          dataList: [item],
-          rectOffset: item.currentTouchPos,
-          rectSize: item.currentTouchSize,
-        ),
-      );
+
+      touchableShapes.add(RectangleShape<ChartBarDataItem>(
+          dataList: [item], rectOffset: item.currentTouchPos, rectSize: item.currentTouchSize));
+
+      beforeTotalHeight = _calculateBeforeTotalHeight(layer, beforeTotalHeight, i);
     }
   }
 
+  ///计算数据位置
   static void _calculate({
     required AnimationController controller,
     required ChartBarDataItem item,
@@ -93,5 +82,44 @@ class _ChartBarPainter {
       pos: Offset(pos.dx, painterData.position.dy),
       size: Size(size.width, painterData.size.height),
     );
+  }
+
+  ///绘制背景颜色
+  static void _drawBarBackground(
+    ChartBarLayer layer,
+    Canvas canvas,
+    ChartBarDataItem item,
+    ChartPainterData painterData,
+  ) {
+    if (layer.settings.barBackground != null) {
+      canvas.drawRRect(
+        RRect.fromRectAndCorners(
+          Offset(item.currentValuePos.dx, painterData.position.dy) & Size(layer.settings.thickness, painterData.size.height),
+          bottomLeft: layer.settings.radius.bottomLeft,
+          bottomRight: layer.settings.radius.bottomRight,
+          topLeft: layer.settings.radius.topLeft,
+          topRight: layer.settings.radius.topRight,
+        ),
+        Paint()..color = layer.settings.barBackground!,
+      );
+    }
+  }
+
+  ///计算瀑布图偏移量
+  static double _calculateBeforeTotalHeight(ChartBarLayer layer, double beforeTotalHeight, int i) {
+    if (layer.settings.waterfallMode) {
+      if (layer.settings.direction == WaterfallBarDirection.toLeft && 0 == i) {
+        beforeTotalHeight = layer.items[i].currentValueSize.height;
+      } else if (layer.settings.direction == WaterfallBarDirection.toRight && layer.items.length - 2 == i) {
+        beforeTotalHeight = 0;
+      } else if (layer.settings.direction == WaterfallBarDirection.toRight) {
+        beforeTotalHeight += layer.items[i].currentValueSize.height;
+      }
+      if (layer.settings.direction == WaterfallBarDirection.toLeft && i < layer.items.length - 1) {
+        final ChartBarDataItem nextItem = layer.items[i + 1];
+        beforeTotalHeight -= nextItem.currentValueSize.height;
+      }
+    }
+    return beforeTotalHeight;
   }
 }

@@ -56,9 +56,11 @@ class _BarPageState extends State<BarPage> {
     return [
       ChartAxisLayer(
         settings: ChartAxisSettings(
+          centerX: true,
           x: ChartAxisSettingsAxis(
+            showAxis: true,
             frequency: 1.0,
-            max: 7.0,
+            max: 8.0,
             min: 0.0,
             textStyle: TextStyle(
               color: Colors.white.withOpacity(0.6),
@@ -80,26 +82,18 @@ class _BarPageState extends State<BarPage> {
       ),
       ChartBarLayer(
         items: List.generate(
-          7,
+          8,
           (index) => ChartBarDataItem(
-            color: const Color(0xFF8043F9),
-            value: Random().nextInt(280) + 20,
+            color: Colors.accents[index],
+            value: Random().nextInt(50) + 5,
             x: index.toDouble(),
           ),
-        )
-          ..add(ChartBarDataItem(
-            color: const Color(0xFF8043F9),
-            value: 300,
-            x: 6,
-          ))
-          ..add(ChartBarDataItem(
-            color: const Color(0xFF8043F9),
-            value: 0,
-            x: 7,
-          )),
+        ),
         settings: const ChartBarSettings(
           thickness: 8.0,
-          background: Color(0x54EE7B3D),
+          barBackground: Color(0x54EE7B3D),
+          waterfallMode: true,
+          direction: WaterfallBarDirection.toLeft,
           radius: BorderRadius.all(Radius.circular(4.0)),
         ),
       ),

@@ -9,7 +9,7 @@ class ChartBarDataItem extends ChartDataItem {
   final double value;
 
   /// The axis x of data item.
-  final double x;
+  double x;
 
   final _ChartBarDataItemTouch _touch;
   final _ChartBarDataItemValue _value;
