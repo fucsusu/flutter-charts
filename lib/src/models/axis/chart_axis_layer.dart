@@ -13,10 +13,10 @@ part 'settings/chart_axis_settings_axis.dart';
 /// This layer allows to render axises.
 class ChartAxisLayer extends ChartLayer {
   /// The x of the axis.
-  final ChartAxisData x;
+  late final ChartAxisData x;
 
   /// The y of the axis.
-  final ChartAxisData y;
+  late final ChartAxisData y;
 
   /// The settings of the axis.
   final ChartAxisSettings settings;
@@ -26,13 +26,18 @@ class ChartAxisLayer extends ChartLayer {
     required String Function(double) labelX,
     required String Function(double) labelY,
     required this.settings,
-  })  : x = settings.x.generate(
-          label: labelX,
-          center: settings.centerX,
-        ),
-        y = settings.y.generate(
-          label: labelY,
-        );
+  }) {
+    if (settings.waterfallMode) {
+      settings.x.max += settings.x.frequency;
+    }
+    x = settings.x.generate(
+      label: labelX,
+      center: settings.centerX,
+    );
+    y = settings.y.generate(
+      label: labelY,
+    );
+  }
 
   /// Disposing all animations.
   @override

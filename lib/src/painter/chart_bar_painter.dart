@@ -15,7 +15,8 @@ class _ChartBarPainter {
     required ChartAxisValue yValue,
     ChartBarLayer? oldLayer,
   }) {
-    double beforeTotalHeight = 0;
+    ///上移偏移量
+    double _upShiftOffset = 0;
     for (int i = 0; i < layer.items.length; i++) {
       final ChartBarDataItem item = layer.items[i];
       _calculate(
@@ -26,12 +27,13 @@ class _ChartBarPainter {
         settings: layer.settings,
         xValue: xValue,
         yValue: yValue,
+        upShiftOffset: _upShiftOffset,
       );
       _drawBarBackground(layer, canvas, item, painterData);
 
       canvas.drawRRect(
         RRect.fromRectAndCorners(
-          item.currentValuePos.translate(0, -beforeTotalHeight) & item.currentValueSize,
+          item.currentValuePos & item.currentValueSize,
           bottomLeft: layer.settings.radius.bottomLeft,
           bottomRight: layer.settings.radius.bottomRight,
           topLeft: layer.settings.radius.topLeft,
@@ -43,7 +45,7 @@ class _ChartBarPainter {
       touchableShapes.add(RectangleShape<ChartBarDataItem>(
           dataList: [item], rectOffset: item.currentTouchPos, rectSize: item.currentTouchSize));
 
-      beforeTotalHeight = _calculateBeforeTotalHeight(layer, beforeTotalHeight, i);
+      _upShiftOffset = _calculateBeforeTotalHeight(layer, _upShiftOffset, i);
     }
   }
 
@@ -55,6 +57,7 @@ class _ChartBarPainter {
     required ChartBarSettings settings,
     required ChartAxisValue xValue,
     required ChartAxisValue yValue,
+    double upShiftOffset = 0,
     ChartBarDataItem? oldItem,
   }) {
     final double offsetX = painterData.size.width * (item.x - xValue.min) / (xValue.max - xValue.min);
@@ -70,16 +73,17 @@ class _ChartBarPainter {
       color: item.color,
       controller: controller,
       initialColor: oldItem?.lastValueColor ?? Colors.transparent,
-      initialPos: oldItem?.lastValuePos ?? Offset(pos.dx, painterData.position.dy + painterData.size.height),
+      initialPos: oldItem?.lastValuePos ??
+          Offset(pos.dx, painterData.position.dy + painterData.size.height).translate(0, -upShiftOffset),
       initialSize: oldItem?.lastValueSize ?? Size(size.width, 0.0),
-      pos: pos,
+      pos: pos.translate(0, -upShiftOffset),
       size: size,
     );
     item.setupTouch(
       controller: controller,
-      initialPos: oldItem?.lastValuePos ?? Offset(pos.dx, painterData.position.dy),
+      initialPos: oldItem?.lastValuePos ?? Offset(pos.dx, painterData.position.dy).translate(0, -upShiftOffset),
       initialSize: oldItem?.lastValueSize ?? Size(size.width, painterData.size.height),
-      pos: Offset(pos.dx, painterData.position.dy),
+      pos: Offset(pos.dx, painterData.position.dy).translate(0, -upShiftOffset),
       size: Size(size.width, painterData.size.height),
     );
   }
@@ -107,17 +111,19 @@ class _ChartBarPainter {
 
   ///计算瀑布图偏移量
   static double _calculateBeforeTotalHeight(ChartBarLayer layer, double beforeTotalHeight, int i) {
-    if (layer.settings.waterfallMode) {
-      if (layer.settings.direction == WaterfallBarDirection.toLeft && 0 == i) {
+    if (layer.settings.waterfallBarDirection == WaterfallBarDirection.toLeft) {
+      if (i == 0) {
         beforeTotalHeight = layer.items[i].currentValueSize.height;
-      } else if (layer.settings.direction == WaterfallBarDirection.toRight && layer.items.length - 2 == i) {
-        beforeTotalHeight = 0;
-      } else if (layer.settings.direction == WaterfallBarDirection.toRight) {
-        beforeTotalHeight += layer.items[i].currentValueSize.height;
       }
-      if (layer.settings.direction == WaterfallBarDirection.toLeft && i < layer.items.length - 1) {
+      if (i + 1 < layer.items.length) {
         final ChartBarDataItem nextItem = layer.items[i + 1];
         beforeTotalHeight -= nextItem.currentValueSize.height;
+      }
+    } else if (layer.settings.waterfallBarDirection == WaterfallBarDirection.toRight) {
+      if (i + 1 == layer.items.length - 1) {
+        beforeTotalHeight = 0;
+      } else {
+        beforeTotalHeight += layer.items[i].currentValueSize.height;
       }
     }
     return beforeTotalHeight;

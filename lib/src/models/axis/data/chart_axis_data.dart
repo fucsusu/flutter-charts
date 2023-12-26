@@ -6,7 +6,7 @@ class ChartAxisData {
   final List<ChartAxisDataItem> items;
 
   /// The max value in the data.
-  final double max;
+  double max;
 
   /// The min value in the data.
   final double min;

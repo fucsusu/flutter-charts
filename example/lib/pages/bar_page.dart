@@ -57,10 +57,11 @@ class _BarPageState extends State<BarPage> {
       ChartAxisLayer(
         settings: ChartAxisSettings(
           centerX: true,
+          waterfallMode: true,
           x: ChartAxisSettingsAxis(
             showAxis: true,
             frequency: 1.0,
-            max: 8.0,
+            max: 7.0,
             min: 0.0,
             textStyle: TextStyle(
               color: Colors.white.withOpacity(0.6),
@@ -77,7 +78,7 @@ class _BarPageState extends State<BarPage> {
             ),
           ),
         ),
-        labelX: (value) => value.toInt().toString(),
+        labelX: (value) => value.toInt().toString() + "s",
         labelY: (value) => value.toInt().toString(),
       ),
       ChartBarLayer(
@@ -92,8 +93,7 @@ class _BarPageState extends State<BarPage> {
         settings: const ChartBarSettings(
           thickness: 8.0,
           barBackground: Color(0x54EE7B3D),
-          waterfallMode: true,
-          direction: WaterfallBarDirection.toLeft,
+          waterfallBarDirection: WaterfallBarDirection.toLeft,
           radius: BorderRadius.all(Radius.circular(4.0)),
         ),
       ),

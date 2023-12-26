@@ -20,17 +20,17 @@ class ChartBarSettings {
   ///背景颜色
   final Color? barBackground;
 
-  ///是否瀑布图
-  final bool waterfallMode;
+  ///瀑布图瀑布走向
+  final WaterfallBarDirection? waterfallBarDirection;
 
-  ///瀑布走向
-  final WaterfallBarDirection direction;
+  /// 频率需与ChartAxisSettingsAxis的frequency一致 用于计算
+  final double frequency;
 
   const ChartBarSettings({
     this.thickness = 4.0,
     this.radius = BorderRadius.zero,
     this.barBackground,
-    this.waterfallMode = false,
-    this.direction = WaterfallBarDirection.toRight,
+    this.waterfallBarDirection,
+    this.frequency = 1.0,
   });
 }
